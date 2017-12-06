@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+
+if { [llength $argv] != 3} {
+    puts "usage: $argv0 <password> <src> <dst>"
+    exit 1
+}
+
+set timeout -1
+set password [lindex $argv 0] 
+set src_path [lindex $argv 1]
+set dst_path [lindex $argv 2] 
+
+spawn scp -P 36000 -qr $src_path $dst_path
+expect {
+    "(yes/no)" { send "yes\r"; exp_continue }
+    "assword:" { send "$password\r"; }
+}
+
+expect eof
+catch wait reason
+exit [lindex $reason 3]
